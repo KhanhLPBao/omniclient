@@ -16,7 +16,7 @@ do
     if [ $(ls $processdir | wc -l ) -gt 0 ] && \
     [ (ls $workingdir | wc -l ) -eq 0 ]
     then
-        nextfile=$( ls $processdir | cut -d " " -f 1 )
+        nextfile=$( ls $processdir"/*.request" | cut -d " " -f 1 )
         filename=`basename $nextfile | cut -d "." -f 2`
         sessionid=`echo $filename | cut -d "_" -f 3`
         contentfile=$sessiondir"/"$sessionid".contents"
@@ -24,6 +24,7 @@ do
         then
             contents= ( )
             mv -f $contentfile $workingdir"/"$sessionid".contents"
+            mv -f $nextfile $workingdir"/"$sessionid".request"
             while IFS= read -r $LINE
             do
                 contents+=$LINE
@@ -56,14 +57,26 @@ do
             else
                 if [ ! -f $storagedir"/method/filecol/"$method_filecol".sh" ]
                 then
-s
+            #LOG
                     echo "$worktime - Session $sessionid encountered Method Wrong error, moved to errordir" >> \
                     $logdir"/"$workdate".adminlog"
             #END LOG
                     echo "S2" > $statusdir"/"$sessionid".sessionstatus" #S2 Error: No file collection method found on server
                     mv -f $nextfile $errordir"/"
+                elif [ ${sample[@]} -eq 0 ]
+                then
+             #LOG
+                    echo "$worktime - Session $sessionid encountered No Samples error, moved to errordir" >> \
+                    $logdir"/"$workdate".adminlog"
+            #END LOG
+                    echo "S3" > $statusdir"/"$sessionid".sessionstatus" #S2 Error: No samples found
+                    mv -f $nextfile $errordir"/"      
                 else
-                    bash $storagedir"/method/filecol/"$method_filecol".sh" $sample
+                    echo "processing" > $statusdir"/"$sessionid".sessionstatus"
+                    echo $sessionid > $processdir"/"$sessionid".sum"
+                    echo $method_filecol >> $processdir"/"$sessionid".sum"
+                    echo ${sample[@]} >> $processdir"/"$sessionid".sum"
+                    mv -f $sessiondir"/"$sessionid".contents" $sessiondir"/"$sessionid".contents.proceed"
                 fi
             fi
         else
