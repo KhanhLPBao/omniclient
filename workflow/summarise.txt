@@ -1,0 +1,3 @@
+align.snakemake: Sequence Alignment
+filterfq.snakemake: Filter FASTQ file, required to run before alignment if enabled
+postalignprocess.snakemake: Alignment file (.sam, .bam) processing

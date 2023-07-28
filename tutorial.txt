@@ -1,0 +1,5 @@
+Enter [workflow script name]:[program on the script, space separated].
+    - Type scriptlist if you don't know about the name of available scripts.
+    - Type workflow:[workflow script name] if you don't know about the program on the script
+    - Type Done when you are completed the installation
+    - Type help to show this note
