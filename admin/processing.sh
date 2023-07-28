@@ -29,14 +29,14 @@ do
                 contents+=$LINE
             done < $workingdir"/"$sessionid".contents"
             
-            method=""
+            method_filecol=""   #File collection method
             sample=( )
             for d in ${contents[@]}
             do
                 prefix=$( echo $d | cut -d " " -f 1 )
                 case $prefix in
                     method)
-                        method=$( echo $d | cut -d " " -f 2 )
+                        method_filecol=$( echo $d | cut -d " " -f 2 )
                     ;;
                     sample)
                         sample+=$( echo $d | cut -d " " -f 2 )     
@@ -45,25 +45,25 @@ do
                         pass
                     ;;
                 esac
-            if [ "$method" == "" ]
+            if [ "$method_filecol" == "" ]
             then
         #LOG
                 echo "$worktime - Session $sessionid encountered Method Null error, moved to errordir" >> \
                 $logdir"/"$workdate".adminlog"
         #END LOG
-                echo "S1" > $statusdir"/"$sessionid".sessionstatus" #S1 Error: No method indicated
+                echo "S1" > $statusdir"/"$sessionid".sessionstatus" #S1 Error: No file collection method indicated
                 mv -f $nextfile $errordir"/"
             else
-                if [ ! -f $storagedir"/method/"$method".sh" ]
+                if [ ! -f $storagedir"/method/filecol/"$method_filecol".sh" ]
                 then
 s
                     echo "$worktime - Session $sessionid encountered Method Wrong error, moved to errordir" >> \
                     $logdir"/"$workdate".adminlog"
             #END LOG
-                    echo "S2" > $statusdir"/"$sessionid".sessionstatus" #S1 Error: No method indicated in server
+                    echo "S2" > $statusdir"/"$sessionid".sessionstatus" #S2 Error: No file collection method found on server
                     mv -f $nextfile $errordir"/"
                 else
-                    bash $storagedir"/method/"$method".sh" $sample
+                    bash $storagedir"/method/filecol/"$method_filecol".sh" $sample
                 fi
             fi
         else
