@@ -78,6 +78,9 @@ install(){
     echo "Begin setup program"
     mkdir $storagedir"/"$clustername
     echo "Account $account regist cluster $clustername to the system" > "$storagedir/account/$account.pass"
+    mkdir "$signaldir/$clustername/in"
+    mkdir "$signaldir/$clustername/out"
+    mkdir "$signaldir/$clustername/log"
     cat "tutorial.txt"
     echo ""
     echo "Command: "

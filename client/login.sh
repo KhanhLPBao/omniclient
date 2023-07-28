@@ -1,7 +1,7 @@
 L=0
-signaldir="/mnt/signal"
+signaldir="/signal"
 clustername=$( hostname )
-storagedir="/"$clustername
+storagedir="storage/"$clustername
 sleep=5     #Time between retry during login
 maxtry=3    #number of maximum try before timedout
 prerun=0

@@ -31,12 +31,14 @@ run(){
                     progname=$( cut -d "." -f 1 $p )
                     progress=$( snakemake -c 1 -s "program/"$scriptname $progname --config SAMPLE="'$mau'" id="'$session'" >\
                     $storagedir"/log/"$session".log" )
-                    if [ $progress eq 0 ]
-                    then 
+                    case $progress in
+                        0)
                         echo 0 > $signaldir"/"$clustername"/out/"$session"_"$mau
-                    else
+                        ;;
+                        *)
                         echo 1 > $signaldir"/"$clustername"/out/"$session"_"$mau
-                    fi
+                        ;;
+                    esac
                 done
             done    
         fi
