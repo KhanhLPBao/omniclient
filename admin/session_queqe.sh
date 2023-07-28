@@ -3,6 +3,7 @@ signaldir="media/signal"
 storagedir="media/storage"
 logdir="log/session"
 linkdir=$storagedir"/link"
+statusdir=$storagedir"/status"
 
 movefile(){
     priority_count=$( ls $signaldir"/processing/*_1_*.request" | wc -l )
@@ -20,12 +21,14 @@ movefile(){
         
         for file in $signaldir"/queqe/priority/*.request" #Move priority request
         do
-            if [ "$file" != $signaldir"/queqe/priority/*.request" ]
+            if [ "$file" != $signaldir"/queqe/priority/*.request" ] && \
+            [ $( ls $signaldir"/processing/*.request" | wc -l ) -lt 9 ] 
             then
                 priority_count+=1
                 name_origin=$( basename $file )
                 name_new=$count"_1_"$name_origin
-                mv -f $file $signaldir"/processing/"$name_new                
+                mv -f $file $signaldir"/processing/"$name_new
+                echo 1 > $statusdir"/"$( echo $name_origin | cut -d "." -f 1 )".sessionstatus"
             fi
         done
     fi
@@ -49,7 +52,7 @@ movefile(){
     done
 
     normal_count=$(ls $signaldir"/queqe/normal" | wc -l )
-    if [ $normal_count -gt 1 ]
+    if [ $normal_count -gt 1 ] && [ $( ls $signaldir"/processing/*.request" | wc -l ) -lt 9 ]
     then
         count=$( ls $signaldir"/processing/*.request" | wc -l )
         #LOG
@@ -59,7 +62,8 @@ movefile(){
 
         for file in $signaldir"/queqe/normal/*.request" #Move normal request
         do
-            if [ "$file" != $signaldir"/queqe/normal/*.request" ]
+            if [ "$file" != $signaldir"/queqe/normal/*.request" ] && \
+            [ $( ls $signaldir"/processing/*.request" | wc -l ) -lt 9 ]
             then
                 name_normal_origin=$( basename $file )
                 name_normal_new=$count"_0_"$name_origin            
@@ -75,18 +79,15 @@ resort(){
 
 }
 
+#Only work if the processing folder has less than 8 files
+#I'm sorry but coding to have 2 digits on all counting is not worth the time ATM
+
 while :
 do
     file_process_count=$( ls $signaldir"/processing" | wc -l )
-    case $file_process_count in
-        0)
-            count=1                        
-        ;;
-        *)
-            count=$file_process_count
-        ;;
-    esac
-
-    movefile
+    if [ $file_process_count -lt 8 ]
+    then
+        movefile
+    fi
     sleep 1m
 done
