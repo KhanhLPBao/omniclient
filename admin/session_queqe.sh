@@ -22,7 +22,7 @@ movefile(){
         for file in $signaldir"/queqe/priority/*.request" #Move priority request
         do
             if [ "$file" != $signaldir"/queqe/priority/*.request" ] && \
-            [ $( ls $signaldir"/processing/*.request" | wc -l ) -lt 9 ] 
+            [ $( ls $signaldir"/processing/*.request" | wc -l ) -lt 8 ] 
             then
                 priority_count+=1
                 name_origin=$( basename $file )
@@ -80,7 +80,7 @@ resort(){
 }
 
 #Only work if the processing folder has less than 8 files
-#I'm sorry but coding to have 2 digits on all counting is not worth the time ATM
+#Coding to have 2 digits on all counting is not worth the time ATM
 
 while :
 do
