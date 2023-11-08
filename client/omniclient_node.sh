@@ -26,10 +26,9 @@ dockerrun(){
                   #     Job failed due to level 1 cannot retrieved any files or all files failed MD5 check
                   :  #<Extra notification for failed jobs
                   ;;
-               fi
+               esac
             fi
          done
-
          sleep 1m
       ;;
       *) 
