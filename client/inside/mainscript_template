@@ -1,0 +1,9 @@
+""""
+MAIN SCRIPT FOR SNAKEMAKE
+Rule All is for tier 2 jobs
+At tier 3 Jobs, each of independent jobs will have separated final rules
+"""
+processdir = '/processdir'  #   Process directory for each files inside session folder
+sessionfiledir = ''         #   Directory of all files downloaded from job lvl 1 for the session if it is tier 2 jobs, or results from tier 2 jobs of this is tier 3 jobs
+sessiondiroutput = ''       #   Directory to output all results, default is 
+
