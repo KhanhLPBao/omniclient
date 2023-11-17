@@ -4,25 +4,27 @@
 # Directory
 req_input=$1
 req_type=$2
+debug_aug=$3
 req_output="/mnt/share/source/debug/omniclient/output"
 scriptdir="/mnt/share/source/omniclient"
 req_progress="/mnt/share/source/debug/omniclient/node"    #location of all processing jobs
 processdir="/mnt/share/source/debug/signal/processing"
 
-echo $req_type
+if [ "$debug_aug" == "--debug" ]
+then
+    echo "Debuging mode detected, logs from crucial steps will be outputed to terminal"
+else
+    debug=""
+fi
 case $req_type in
     admin)  #Execute registration request from omniadmin
         echo "Admin request for $req_input detected"
-        python $scriptdir"/admin/python/system/sessioninit.py" $req_input
-
-        case $sessionL1complete in
-            DONE)
-                rm -f $processdir/
-            ;;
-            *)  # Level 1 failed 
-            ;;
-        esac
-        #echo "script run successfully with $req_input"
+        
+        if [ "$debug_aug" == "--debug" ]
+        then
+            echo "python $scriptdir/admin/python/system/sessioninit.py $req_input $debug_aug"
+        fi
+        python $scriptdir"/admin/python/system/sessioninit.py" $req_input $debug_aug
     ;;
     interface)  #Decode request first to validate
         interface_type=$3
