@@ -20,7 +20,7 @@ dockerrun(){
                sessionstatus=`cat $previousoutput"/"$sessionname"/status.txt"`
                case $sessionstatus in
                   DONE)
-                     docker exec $nodename ./runsession.sh $sessionname
+                     docker exec -d $nodename ./runsession.sh $sessionname
                   ;;
                   STOP)
                   #     Job failed due to level 1 cannot retrieved any files or all files failed MD5 check

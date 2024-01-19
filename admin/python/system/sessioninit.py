@@ -64,7 +64,8 @@ def md5check(md5ref,md5file):
         debug_output(['MD5 Comparison returned with result: ',md5_compare])
     except FileNotFoundError:
         debug_output('Not found MD5 file')
-        md5_compare = False   
+        md5_compare = False
+    subcommand(['rm',md5ref])   
     return md5_compare
 ###################################################################################################################
 #  Jobs level explained                                                                                           #

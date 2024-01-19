@@ -3,14 +3,16 @@ MAIN SCRIPT FOR SNAKEMAKE
 Rule All is for tier 2 jobs
 At tier 3 Jobs, each of independent jobs will have separated final rules
 """
+import glob
 processdir = '/processdir'  #   Process directory for each files inside session folder
-sessionfiledir = ''         #   Directory of all files downloaded from job lvl 1 for the session if it is tier 2 jobs, or results from tier 2 jobs of this is tier 3 jobs
-sessiondiroutput = ''       #   Directory to output all results, default is 
-
-filelist = glob.glob(f'{sessionfiledir}/*')
+sessionin = config['sessionin']         #   Directory of all files downloaded from job lvl 1 for the session if it is tier 2 jobs, or results from tier 2 jobs of this is tier 3 jobs
+sessiondiroutput = '/media'       #   Directory to output all results, default is 
+sessionout = config['sessionout']
+sessionfiledir = processdir + '/' + sessionin
+filelist = [_file.split('/')[-1].split('.')[0] for _file in glob.glob(f'{sessionfiledir}/*.fq.gz')]
 
 rule all:
     input:
-        expand('{file}',file=filelist)
+        expand(processdir + '/' + sessionin + '/{file}.fq.gz',file=filelist)
     shell:
         "echo {input}"

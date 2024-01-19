@@ -4,18 +4,12 @@
 # Directory
 req_input=$1
 req_type=$2
-debug_aug=$3
 req_output="/mnt/share/source/debug/omniclient/output"
 scriptdir="/mnt/share/source/omniclient"
 req_progress="/mnt/share/source/debug/omniclient/node"    #location of all processing jobs
 processdir="/mnt/share/source/debug/signal/processing"
-
-if [ "$debug_aug" == "--debug" ]
-then
-    echo "Debuging mode detected, logs from crucial steps will be outputed to terminal"
-else
-    debug=""
-fi
+logindir="/mnt/share/source/debug/loginserver/input"
+seqdir="/mnt/share/source/debug/omniclient/interface_response"
 case $req_type in
     admin)  #Execute registration request from omniadmin
         echo "Admin request for $req_input detected"
@@ -26,49 +20,23 @@ case $req_type in
         fi
         python $scriptdir"/admin/python/system/sessioninit.py" $req_input $debug_aug
     ;;
-    interface)  #Decode request first to validate
-        interface_type=$3
-        case $interface_type in
-            login)
-                decoderesults=$(python "$scriptdir/admin/account/python/account/hashstring.py" "decode" "'$file'" "'$req_token'")
-                if [[ ! $decoderesults -eq 5 ]]   #Valid request
-                then
-                    #   Check account storage folder
-                    #   return result: Accept or reject log in
-                    accountcompare=$(python "$scriptdir/admin/account/python/account/login.py login $decoderesults")
-                    case $accountcompare in
-                        accept)
-                            token=$(python "$scriptdir/admin/account/python/account/hashstring.py" "token")
-                            echo $token > "$req_output/$req_token-response.$typerequest"
-                        ;;
-                        deny)
-                            echo "Deny" > "$req_output/$req_token-response.$typerequest"
-                        ;;
-                        *)
-                            echo "Server Error - $accountcompare" > "$req_output/$req_token-response.$typerequest"
-                        ;;
-                    esac
-                fi
-            ;;
-            reg)
-                decoderesults=$(python "$scriptdir/admin/account/python/account/hashstring.py" "decode" "'$file'" "'$req_token'")
-                accountregis=$(python "$scriptdir/admin/account/python/account/login.py reg  $decoderesults")
-                case $accountregis in
-                    Done)
-                        echo "Done" > "$req_output/$req_token-response.$typerequest"
-                    ;;
-                    *)
-                        echo "ERROR - $accountregis" > "$req_output/$req_token-response.$typerequest"
-                    ;;
-                esac
-            ;;
-            req)  #Interface request run
-                :
-                #   Check valid token
-                #   Check account permission
-                #   Write .request, .jobs, .files files
-            ;;
-        esac
+    request)  #Decode request first to validate
+        python $scriptdir"/admin/python/request.py" $req_input
+    ;;
+    register)
+        loginfile=`basename $req_input`
+        docker cp $loginfile loginserver:/mnt/server/in
+        rm $req_input
+        docker exec -d loginserver /bin/python3 /home/software/login/login.sh $loginfile register
+    ;;
+    login)   #Decode and answer login request
+        loginfile=`basename $req_input`
+        loginseq=$(echo $loginfile | cut -d '.' -f 1)
+        echo "Begin to copy loginfile $loginfile"
+        docker cp $req_input loginserver:/mnt/server/in
+        docker cp $seqdir/$loginseq.seq loginserver:/mnt/server/in
+        rm $req_input
+        docker exec loginserver /bin/python3 /home/software/login/login.py $loginseq login > $seqdir/$loginseq.log
     ;;
 esac
 
